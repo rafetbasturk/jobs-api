@@ -5,6 +5,9 @@ const cors = require("cors")
 const xss = require("xss-clean")
 const rateLimit = require("express-rate-limit")
 const express = require("express")
+const swaggerUI = require("swagger-ui-express")
+const YAML = require("yamljs")
+const swaggerDocument = YAML.load("./swagger.yaml")
 
 const jobRoutes = require("./routes/jobRouter")
 const authRoutes = require("./routes/authRouter")
@@ -29,6 +32,10 @@ app.use(cors())
 app.use(xss())
 
 //routers
+app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocument))
+app.get("/", (req, res) => {
+  res.send("<h1>Jobs API</h1><a href='/api-docs'>Documentation</a>")
+})
 app.use("/api/v1/auth", authRoutes)
 app.use("/api/v1/jobs", authenticate, jobRoutes)
 app.use(notFound)
